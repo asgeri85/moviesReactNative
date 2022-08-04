@@ -1,26 +1,35 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import TopFilmCard from '../../../components/card/TopFilmCard';
 import FilmCard from '../../../components/card/FilmCard';
+import useFetchApi from '../../../hooks/useFetchApi/useFetchApi';
+import Loading from '../../../components/Loading';
 
-const Home = () => {
-  const DATA = [
-    {
-      id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-      title: 'First Item',
-    },
-    {
-      id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-      title: 'Second Item',
-    },
-    {
-      id: '58694a0f-3da1-471f-bd96-145571e29d72',
-      title: 'Third Item',
-    },
-  ];
+const Home = ({navigation}) => {
+  const {getNowShownFilm, nowFilm, loading, error, getTopFilm, topFilm} =
+    useFetchApi();
 
-  const renderTopFilm = ({item}) => <TopFilmCard />;
+  useEffect(() => {
+    getNowShownFilm();
+    getTopFilm();
+  }, []);
+
+  const renderTopFilm = ({item}) => (
+    <TopFilmCard onPress={() => onClickFilm(item)} topFilm={item} />
+  );
+
+  const renderFilm = ({item}) => (
+    <FilmCard film={item} onPress={() => onClickFilm(item)} />
+  );
+
+  const onClickFilm = film => {
+    navigation.navigate('DetailScreen', {id: film.id});
+  };
+
+  if (error) {
+    return <Text>{error}</Text>;
+  }
 
   return (
     <View style={styles.container}>
@@ -29,27 +38,38 @@ const Home = () => {
         <Text style={styles.barTitle}>Filmler</Text>
         <Icon name="bell-badge-outline" size={25} color="#110E47" />
       </View>
-      <View style={styles.headerContainer}>
-        <Text style={styles.barTitle}>Now Showing</Text>
-        <TouchableOpacity style={styles.headerButtonContainer}>
-          <Text>See More</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={{marginTop: 5}}>
-        <FlatList
-          data={DATA}
-          renderItem={renderTopFilm}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        />
-      </View>
-      <View style={styles.headerContainer}>
-        <Text style={styles.barTitle}>Popular</Text>
-        <TouchableOpacity style={styles.headerButtonContainer}>
-          <Text>See More</Text>
-        </TouchableOpacity>
-      </View>
-      <FilmCard />
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+          <View style={styles.headerContainer}>
+            <Text style={styles.barTitle}>Now Showing</Text>
+            <TouchableOpacity style={styles.headerButtonContainer}>
+              <Text>See More</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{marginTop: 5}}>
+            <FlatList
+              data={nowFilm}
+              renderItem={renderTopFilm}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            />
+          </View>
+          <View style={styles.headerContainer}>
+            <Text style={styles.barTitle}>Popular</Text>
+            <TouchableOpacity style={styles.headerButtonContainer}>
+              <Text>See More</Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={topFilm}
+            renderItem={renderFilm}
+            style={{flex: 1}}
+            showsVerticalScrollIndicator={false}
+          />
+        </>
+      )}
     </View>
   );
 };

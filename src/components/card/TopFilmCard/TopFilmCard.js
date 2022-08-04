@@ -8,23 +8,28 @@ import {
   Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Config from 'react-native-config';
 
 const device = Dimensions.get('window');
 
-const TopFilmCard = () => {
+const TopFilmCard = ({onPress, topFilm}) => {
+  const uriImage = `${Config.API_IMAGE}${topFilm.poster_path}`;
+
   return (
-    <TouchableNativeFeedback>
+    <TouchableNativeFeedback onPress={onPress}>
       <View style={styles.container}>
         <View style={styles.imageContainer}>
-          <Image source={require('./image.jpg')} style={styles.image} />
+          <Image source={{uri: uriImage}} style={styles.image} />
         </View>
         <View style={styles.titleContainer}>
           <Text style={styles.title} numberOfLines={2}>
-            Spiderman: No Way Home
+            {topFilm.original_title}
           </Text>
           <View style={styles.ratingContainer}>
             <Icon name="star" size={16} color="#FFC319" />
-            <Text style={styles.ratingTitle}>9.1/10 IMDb</Text>
+            <Text style={styles.ratingTitle}>
+              {topFilm.vote_average}/10 IMDb
+            </Text>
           </View>
         </View>
       </View>

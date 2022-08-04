@@ -1,8 +1,13 @@
 import React from 'react';
 import AppNavigationContainer from './src/navigation/AppNavigationContainer';
+import UserProvider from './src/redux/Provider';
 
 const App = () => {
-  return <AppNavigationContainer />;
+  return (
+    <UserProvider>
+      <AppNavigationContainer />
+    </UserProvider>
+  );
 };
 
 export default App;
